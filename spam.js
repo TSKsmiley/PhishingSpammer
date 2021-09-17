@@ -3,13 +3,18 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const faker = require("faker")
 var names = require("./names.json");
+var columnify = require('columnify');
+const chalk = require('chalk');
+ 
 
+let i = 0;
 
 init();
 
 async function init(){
 
     while (true) {
+        i++;
     
         var rand = Math.floor((Math.random()*names.length)+1);
         var rand2 = Math.floor((Math.random()*names.length)+1);
@@ -37,10 +42,39 @@ async function init(){
         "mode": "cors"
         });
 
+        if (!res.ok) {
+
+            var columns = columnify([{
+                ERROR       : chalk.red("Error"),
+                STATUS   : chalk.red(res.statusText + " : " + res.status),
+                ERROR2     : chalk.red("Error")
+                }],{
+                minWidth:30,columnSplitter: ' | ',
+            })
+               
+            console.log(columns);
+
+            await sleep(5000);
+        }
     
-        console.log(`Name: ${name} | Password: ${pass} | Response: ${res.status}`);
+        var columns = columnify([{
+            index      : i,
+            name       : name,
+            password   : pass,
+            status     : chalk.green(res.statusText)
+            }],{
+            minWidth:30,columnSplitter: ' | '
+        })
+           
+        console.log(columns);
     
-        
+        await sleep(180);
     }
 
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
